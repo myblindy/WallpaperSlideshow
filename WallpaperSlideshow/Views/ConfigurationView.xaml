@@ -1,0 +1,68 @@
+﻿<Window x:Class="WallpaperSlideshow.Views.ConfigurationView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:WallpaperSlideshow.Models" 
+        xmlns:viewmodels="clr-namespace:WallpaperSlideshow.ViewModels"
+        mc:Ignorable="d" 
+        x:Name="RootWindow" Title="Wallpaper Slideshow Configuration" WindowStartupLocation="CenterScreen" Height="450" Width="800" Icon="/app.ico">
+    <Window.DataContext>
+        <viewmodels:ConfigurationViewModel/>
+    </Window.DataContext>
+    <DockPanel>
+        <GroupBox DockPanel.Dock="Bottom" Header="General">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0">Swap Interval (in seconds):</TextBlock>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=(models:Monitor.IntervalSeconds), Converter={StaticResource DoubleConverter}, Mode=TwoWay}"/>
+
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+                    <Button Command="{Binding AdvanceSlideShowCommand}">Advance Slide-Show</Button>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <DataGrid x:Name="Monitors" DockPanel.Dock="Left" AutoGenerateColumns="False" ItemsSource="{x:Static models:Monitor.AllMonitors}" IsReadOnly="True"
+                  SelectedItem="{Binding SelectedMonitor}" SelectionMode="Single" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HeadersVisibility="Column">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Monitor" Binding="{Binding Index}"/>
+                <DataGridCheckBoxColumn Header="Active" Binding="{Binding Active}"/>
+                <DataGridTextColumn Header="X" Binding="{Binding Left}"/>
+                <DataGridTextColumn Header="Y" Binding="{Binding Top}"/>
+                <DataGridTextColumn Header="Geometry" Binding="{Binding Converter={StaticResource MonitorToGeometryTypeConverter}}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid DataContext="{Binding SelectedItem, ElementName=Monitors}" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0">Path:</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path}"/>
+
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+                <Button Command="{Binding DataContext.OpenFolderCommand, ElementName=RootWindow}">Open Folder</Button>
+                <Button Command="{Binding DataContext.OpenInBrowserCommand, ElementName=RootWindow}">Open in Browser</Button>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>
