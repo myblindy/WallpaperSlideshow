@@ -53,7 +53,7 @@ class WallpaperService
             monitors.Add(new() { Index = monitors.Count });
 
         // update the paths
-        for (var idx = 0; idx < monitors.Count; idx++)
+        for (var idx = 0; idx < count; idx++)
         {
             monitors[idx].Active = true;
             monitors[idx].MonitorPath = desktopWallpaper.GetMonitorDevicePathAt((uint)idx);
