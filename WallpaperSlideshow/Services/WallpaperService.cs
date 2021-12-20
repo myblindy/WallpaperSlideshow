@@ -58,9 +58,13 @@ class WallpaperService
             monitors[idx].Active = true;
             monitors[idx].MonitorPath = desktopWallpaper.GetMonitorDevicePathAt((uint)idx);
 
-            var rect = desktopWallpaper.GetMonitorRECT(monitors[idx].MonitorPath!);
-            (monitors[idx].Left, monitors[idx].Right, monitors[idx].Top, monitors[idx].Bottom) =
-                (rect.Left, rect.Right, rect.Top, rect.Bottom);
+            try
+            {
+                var rect = desktopWallpaper.GetMonitorRECT(monitors[idx].MonitorPath!);
+                (monitors[idx].Left, monitors[idx].Right, monitors[idx].Top, monitors[idx].Bottom) =
+                    (rect.Left, rect.Right, rect.Top, rect.Bottom);
+            }
+            catch { }
         }
     }
 
@@ -78,7 +82,13 @@ class WallpaperService
                     if (fileCacheService.GetRandomFilePath(path) is { } wallpaperPath)
                     {
                         desktopWallpaper.SetPosition(DesktopWallpaperPosition.Fill);
-                        desktopWallpaper.SetWallpaper(monitorPath, wallpaperPath);
+
+                        try
+                        {
+                            // this can fail while monitors are offline
+                            desktopWallpaper.SetWallpaper(monitorPath, wallpaperPath);
+                        }
+                        catch { }
                         break;
                     }
     }
