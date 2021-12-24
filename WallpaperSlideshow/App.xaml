@@ -10,6 +10,10 @@
                 <ResourceDictionary>
                     <converters:MonitorToGeometryTypeConverter x:Key="MonitorToGeometryTypeConverter"/>
                     <converters:DoubleConverter x:Key="DoubleConverter"/>
+                    <converters:MonitorPreviewLeftConverter x:Key="MonitorPreviewLeftConverter"/>
+                    <converters:MonitorPreviewTopConverter x:Key="MonitorPreviewTopConverter"/>
+                    <converters:MonitorPreviewWidthConverter x:Key="MonitorPreviewWidthConverter"/>
+                    <converters:MonitorPreviewHeightConverter x:Key="MonitorPreviewHeightConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

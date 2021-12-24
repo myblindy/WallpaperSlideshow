@@ -12,9 +12,9 @@ namespace WallpaperSlideshow.Converters;
 class MonitorToGeometryTypeConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
-        value is not Monitor monitor ? Binding.DoNothing : monitor.Right - monitor.Left > monitor.Bottom - monitor.Top 
-            ? $"Horizontal ({monitor.Right - monitor.Left}x{monitor.Bottom - monitor.Top})" 
-            : $"Vertical ({monitor.Right - monitor.Left}x{monitor.Bottom - monitor.Top})";
+        value is not Monitor monitor ? Binding.DoNothing : monitor.Bounds!.Width > monitor.Bounds!.Height
+            ? $"Horizontal ({monitor.Bounds!.Width}x{monitor.Bounds!.Height})"
+            : $"Vertical ({monitor.Bounds!.Width}x{monitor.Bounds!.Height})";
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {

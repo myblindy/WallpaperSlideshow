@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,18 +17,20 @@ class ConfigurationViewModel : ReactiveObject
 {
     public ConfigurationViewModel()
     {
-        OpenFolderCommand = ReactiveCommand.Create(() =>
+        OpenFolderCommand = ReactiveCommand.Create<Monitor>(selectedMonitor =>
         {
-            var path = WallpaperService.GetWallpaperPath(SelectedMonitor!.MonitorPath!);
+            var path = WallpaperService.GetWallpaperPath(selectedMonitor!.MonitorPath!);
             using (Process.Start(new ProcessStartInfo("explorer", $"/select,\"{path}\"") { UseShellExecute = false })) { }
-        }, this.WhenAnyValue(x => x.SelectedMonitor).Select(x => x is not null));
+        });
 
         OpenInBrowserCommand = ReactiveCommand.Create(() =>
         {
 
-        }, this.WhenAnyValue(x => x.SelectedMonitor).Select(x => x is not null));
+        });
 
         AdvanceSlideShowCommand = ReactiveCommand.Create(() => WallpaperService.AdvanceWallpaperSlideShow());
+
+        SelectMonitorCommand = ReactiveCommand.Create<Monitor>(monitor => SelectedMonitor = monitor);
     }
 
     Monitor? selectedMonitor;
@@ -36,4 +39,5 @@ class ConfigurationViewModel : ReactiveObject
     public ICommand OpenFolderCommand { get; }
     public ICommand OpenInBrowserCommand { get; }
     public ICommand AdvanceSlideShowCommand { get; }
+    public ICommand SelectMonitorCommand { get; }
 }

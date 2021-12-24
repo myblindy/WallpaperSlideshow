@@ -11,18 +11,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WallpaperSlideshow.Support;
 using WallpaperSlideshow.ViewModels;
 
-namespace WallpaperSlideshow.Views
+namespace WallpaperSlideshow.Views;
+
+public partial class ConfigurationView : Window
 {
-    /// <summary>
-    /// Interaction logic for ConfigurationView.xaml
-    /// </summary>
-    public partial class ConfigurationView : Window
+    public ConfigurationView()
     {
-        public ConfigurationView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        this.DisableMinimizeMaximizeButtons(false, true);
     }
 }

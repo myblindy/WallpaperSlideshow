@@ -60,10 +60,8 @@ public partial class App : Application
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
     }
 
-    private void DisplaySettingsChanged(object? sender, EventArgs e)
-    {
-        WallpaperService.UpdateGeometry(Monitor.AllMonitors);
-    }
+    private void DisplaySettingsChanged(object? sender, EventArgs e) => 
+        WallpaperService.UpdateGeometry();
 
     protected override void OnExit(ExitEventArgs e)
     {
