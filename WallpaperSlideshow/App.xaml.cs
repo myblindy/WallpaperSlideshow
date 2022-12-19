@@ -2,13 +2,11 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows;
 using WallpaperSlideshow.Models;
 using WallpaperSlideshow.Services;

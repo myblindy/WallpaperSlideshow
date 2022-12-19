@@ -1,17 +1,12 @@
 ﻿using DynamicData;
 using DynamicData.Binding;
-using ReactiveUI;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using WallpaperSlideshow.Models;
-using WallpaperSlideshow.Support;
 
 namespace WallpaperSlideshow.Services;
 
@@ -22,11 +17,12 @@ class WallpaperService
     static readonly DispatcherTimer timer = new();
     static WallpaperService()
     {
-        timer.Tick += (s, e) => AdvanceWallpaperSlideShow();
+        timer.Tick += (s, e) => _ = AdvanceWallpaperSlideShow(false);
 
         static void setTimer()
         {
-            timer.Interval = TimeSpan.FromSeconds(Monitor.IntervalSeconds);
+            timer.Stop();
+            timer.Interval = TimeSpan.FromSeconds(Monitor.IntervalSeconds / Math.Max(1, Monitor.AllMonitors.Count(m => m.Active)));
             if (Monitor.IntervalSeconds > 0)
                 timer.Start();
             else
@@ -42,7 +38,11 @@ class WallpaperService
         };
 
         // bind the file cache
-        Monitor.AllMonitors.ToObservableChangeSet().AutoRefresh().Subscribe(_ => fileCacheService.Update(Monitor.AllMonitors.Select(w => w.Path)));
+        Monitor.AllMonitors.ToObservableChangeSet().AutoRefresh().Subscribe(_ =>
+        {
+            fileCacheService.Update(Monitor.AllMonitors.Select(w => w.Path));
+            setTimer();
+        });
     }
 
     public static void UpdateGeometry()
@@ -90,28 +90,46 @@ class WallpaperService
 
     public static string GetWallpaperPath(string monitorPath) => desktopWallpaper.GetWallpaper(monitorPath);
 
-    public static async Task AdvanceWallpaperSlideShow()
+    static int lastMonitorWithChangedWallpaper = 0;
+    public static async Task AdvanceWallpaperSlideShow(bool allMonitors)
     {
         (string monitorPath, string? path)[] monitors;
+        int monitorToChange;
 
         UpdateGeometry();
         lock (Monitor.AllMonitors)
-            monitors = Monitor.AllMonitors.Where(s => s.Active).Select(s => (s.MonitorPath!, s.Path)).ToArray();
+        {
+            monitors = Monitor.AllMonitors.Where(s => s.Active && !string.IsNullOrWhiteSpace(s.Path) && !string.IsNullOrWhiteSpace(s.MonitorPath)).Select(s => (s.MonitorPath!, s.Path)).ToArray();
+            monitorToChange = lastMonitorWithChangedWallpaper++ % monitors.Length;
+        }
 
         var wallpaperPaths = new string?[monitors.Length];
 
-        int monitorIdx = 0;
-        foreach (var (monitorPath, path) in monitors)
+        if (allMonitors)
+            for (int monitorIdx = 0; monitorIdx < monitors.Length; ++monitorIdx)
+                changeMonitorWallpaper(monitorIdx);
+        else
+            changeMonitorWallpaper(monitorToChange);
+
+        await Application.Current.Dispatcher.BeginInvoke(() =>
         {
-            if (!string.IsNullOrWhiteSpace(path))
+            lock (Monitor.AllMonitors)
+                for (int idx = 0; idx < wallpaperPaths.Length && idx < Monitor.AllMonitors.Count; ++idx)
+                    if (wallpaperPaths[idx] is { } currentWallpaperPath)
+                        Monitor.AllMonitors[idx].CurrentWallpaperPath = currentWallpaperPath;
+        });
+
+        void changeMonitorWallpaper(int monitorIdx)
+        {
+            if (!string.IsNullOrWhiteSpace(monitors[monitorIdx].path))
                 for (int retry = 0; retry < 100; ++retry)
-                    if (fileCacheService.GetRandomFilePath(path) is { } wallpaperPath)
+                    if (fileCacheService.GetRandomFilePath(monitors[monitorIdx].path!) is { } wallpaperPath)
                     {
                         try
                         {
                             // this can fail while monitors are offline or when the RPC server is unavailable
                             desktopWallpaper.SetPosition(DesktopWallpaperPosition.Fill);
-                            desktopWallpaper.SetWallpaper(monitorPath, wallpaperPath);
+                            desktopWallpaper.SetWallpaper(monitors[monitorIdx].monitorPath, wallpaperPath);
                             wallpaperPaths[monitorIdx] = wallpaperPath;
                         }
                         catch (COMException ex) when ((uint)ex.ErrorCode == 0x800706BA)
@@ -123,16 +141,7 @@ class WallpaperService
                         catch { }
                         break;
                     }
-            ++monitorIdx;
         }
-
-        await Application.Current.Dispatcher.BeginInvoke(() =>
-        {
-            lock (Monitor.AllMonitors)
-                for (int idx = 0; idx < wallpaperPaths.Length && idx < Monitor.AllMonitors.Count; ++idx)
-                    if (wallpaperPaths[idx] is { } currentWallpaperPath)
-                        Monitor.AllMonitors[idx].CurrentWallpaperPath = currentWallpaperPath;
-        });
     }
 
     [ComImport]
