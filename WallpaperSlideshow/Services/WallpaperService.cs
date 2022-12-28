@@ -47,44 +47,52 @@ class WallpaperService
 
     public static void UpdateGeometry()
     {
-        var count = desktopWallpaper.GetMonitorDevicePathCount();
-
-        lock (Monitor.AllMonitors)
+        try
         {
-            for (var idx = (int)count; idx < Monitor.AllMonitors.Count; ++idx)
-                Monitor.AllMonitors[idx].Active = false;
-            while (count > Monitor.AllMonitors.Count)
-                Monitor.AllMonitors.Add(new() { Index = Monitor.AllMonitors.Count });
+            var count = desktopWallpaper.GetMonitorDevicePathCount();
 
-            // update the paths
-            for (var idx = 0; idx < count; idx++)
+            lock (Monitor.AllMonitors)
             {
-                Monitor.AllMonitors[idx].Active = true;
-                Monitor.AllMonitors[idx].MonitorPath = desktopWallpaper.GetMonitorDevicePathAt((uint)idx);
+                for (var idx = (int)count; idx < Monitor.AllMonitors.Count; ++idx)
+                    Monitor.AllMonitors[idx].Active = false;
+                while (count > Monitor.AllMonitors.Count)
+                    Monitor.AllMonitors.Add(new() { Index = Monitor.AllMonitors.Count });
 
-                try
+                // update the paths
+                for (var idx = 0; idx < count; idx++)
                 {
-                    var rect = desktopWallpaper.GetMonitorRECT(Monitor.AllMonitors[idx].MonitorPath!);
-                    Monitor.AllMonitors[idx].Bounds = new()
-                    {
-                        Left = rect.Left,
-                        Top = rect.Top,
-                        Width = rect.Right - rect.Left,
-                        Height = rect.Bottom - rect.Top
-                    };
-                }
-                catch { }
-            }
+                    Monitor.AllMonitors[idx].Active = true;
+                    Monitor.AllMonitors[idx].MonitorPath = desktopWallpaper.GetMonitorDevicePathAt((uint)idx);
 
-            var left = Monitor.AllMonitors.Where(w => w.Bounds is not null).Min(w => w.Bounds!.Left);
-            int top = Monitor.AllMonitors.Where(w => w.Bounds is not null).Min(w => w.Bounds!.Top);
-            Monitor.AllBounds = new()
-            {
-                Left = left,
-                Top = top,
-                Width = Monitor.AllMonitors.Where(w => w.Bounds is not null).Max(w => w.Bounds!.Left + w.Bounds!.Width) - left,
-                Height = Monitor.AllMonitors.Where(w => w.Bounds is not null).Max(w => w.Bounds!.Top + w.Bounds!.Height) - top
-            };
+                    try
+                    {
+                        var rect = desktopWallpaper.GetMonitorRECT(Monitor.AllMonitors[idx].MonitorPath!);
+                        Monitor.AllMonitors[idx].Bounds = new()
+                        {
+                            Left = rect.Left,
+                            Top = rect.Top,
+                            Width = rect.Right - rect.Left,
+                            Height = rect.Bottom - rect.Top
+                        };
+                    }
+                    catch { }
+                }
+
+                var left = Monitor.AllMonitors.Where(w => w.Bounds is not null).Min(w => w.Bounds!.Left);
+                int top = Monitor.AllMonitors.Where(w => w.Bounds is not null).Min(w => w.Bounds!.Top);
+                Monitor.AllBounds = new()
+                {
+                    Left = left,
+                    Top = top,
+                    Width = Monitor.AllMonitors.Where(w => w.Bounds is not null).Max(w => w.Bounds!.Left + w.Bounds!.Width) - left,
+                    Height = Monitor.AllMonitors.Where(w => w.Bounds is not null).Max(w => w.Bounds!.Top + w.Bounds!.Height) - top
+                };
+            }
+        }
+        catch (COMException ex) when ((uint)ex.ErrorCode == 0x800706BA)
+        {
+            // RPC server unavailable, recreate the object
+            try { desktopWallpaper = (IDesktopWallpaper)new DesktopWallpaper(); } catch { }
         }
     }
 
@@ -227,7 +235,7 @@ class WallpaperService
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Rect
+    readonly struct Rect
     {
         public readonly int Left;
         public readonly int Top;
