@@ -1,18 +1,16 @@
 ﻿using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace WallpaperSlideshow.Models;
 
-class Monitor : ReactiveObject
+sealed class Monitor : ReactiveObject
 {
     public int Index { get; init; }
 
-    string? monitorPath;
-    public string? MonitorPath { get => monitorPath; set => this.RaiseAndSetIfChanged(ref monitorPath, value); }
-
-    Rectangle? bounds;
-    public Rectangle? Bounds { get => bounds; set => this.RaiseAndSetIfChanged(ref bounds, value); }
+    public Screen? Screen => Screen.AllScreens.ElementAtOrDefault(Index);
 
     bool active;
     public bool Active { get => active; set => this.RaiseAndSetIfChanged(ref active, value); }
@@ -28,7 +26,7 @@ class Monitor : ReactiveObject
     static Rectangle? allBounds;
     public static Rectangle? AllBounds { get => allBounds; set { allBounds = value; StaticPropertyChanged?.Invoke(null, new(nameof(AllBounds))); } }
 
-    static double intervalSeconds = 300;
+    static double intervalSeconds = 60;
     public static double IntervalSeconds { get => intervalSeconds; set { intervalSeconds = value; StaticPropertyChanged?.Invoke(null, new(nameof(IntervalSeconds))); } }
 
     public static event PropertyChangedEventHandler? StaticPropertyChanged;

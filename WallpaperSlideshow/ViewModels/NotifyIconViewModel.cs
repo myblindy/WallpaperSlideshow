@@ -6,11 +6,11 @@ using WallpaperSlideshow.Views;
 
 namespace WallpaperSlideshow.ViewModels;
 
-class NotifyIconViewModel : ReactiveObject
+sealed class NotifyIconViewModel : ReactiveObject
 {
     public NotifyIconViewModel()
     {
-        AdvanceSlideShowCommand = ReactiveCommand.Create(() => WallpaperService.AdvanceWallpaperSlideShow(true));
+        AdvanceSlideShowCommand = ReactiveCommand.Create(() => WallpaperService.AdvanceWallpaperSlideShow());
         ShowConfigurationCommand = ReactiveCommand.Create(() => new ConfigurationView().Show());
         ExitCommand = ReactiveCommand.Create(Application.Current.Shutdown);
     }
