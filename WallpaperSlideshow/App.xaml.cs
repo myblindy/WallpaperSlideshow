@@ -19,13 +19,13 @@ public partial class App : Application
 
     const string configurationFileName = "config.json";
 
-    class MonitorConfiguration
+    sealed class MonitorConfiguration
     {
         public int Index { get; set; }
         public List<string> Paths { get; set; } = null!;
     }
 
-    class Configuration
+    sealed class Configuration
     {
         public List<MonitorConfiguration> Monitors { get; set; } = null!;
         public double IntervalSeconds { get; set; }
@@ -58,7 +58,7 @@ public partial class App : Application
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
     }
 
-    private void DisplaySettingsChanged(object? sender, EventArgs e) => 
+    private void DisplaySettingsChanged(object? sender, EventArgs e) =>
         WallpaperService.UpdateGeometry();
 
     protected override void OnExit(ExitEventArgs e)

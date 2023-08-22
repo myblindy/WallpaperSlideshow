@@ -5,7 +5,7 @@ using WallpaperSlideshow.Models;
 
 namespace WallpaperSlideshow.Converters;
 
-class MonitorToGeometryTypeConverter : IValueConverter
+sealed class MonitorToGeometryTypeConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
         value is not Monitor monitor || monitor.Screen is null ? Binding.DoNothing : monitor.Screen.Bounds!.Width > monitor.Screen.Bounds!.Height

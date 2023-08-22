@@ -6,7 +6,7 @@ using WallpaperSlideshow.Views;
 
 namespace WallpaperSlideshow.ViewModels;
 
-class NotifyIconViewModel : ReactiveObject
+sealed class NotifyIconViewModel : ReactiveObject
 {
     public NotifyIconViewModel()
     {

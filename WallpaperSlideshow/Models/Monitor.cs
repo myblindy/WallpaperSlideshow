@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace WallpaperSlideshow.Models;
 
-class Monitor : ReactiveObject
+sealed class Monitor : ReactiveObject
 {
     public int Index { get; init; }
 

@@ -8,7 +8,7 @@ using WallpaperSlideshow.Services;
 
 namespace WallpaperSlideshow.ViewModels;
 
-class ConfigurationViewModel : ReactiveObject
+sealed class ConfigurationViewModel : ReactiveObject
 {
     public ConfigurationViewModel()
     {

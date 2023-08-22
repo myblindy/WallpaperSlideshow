@@ -7,16 +7,15 @@ using System.Threading;
 
 namespace WallpaperSlideshow.Services;
 
-class FileCacheService
+sealed partial class FileCacheService
 {
-    class Data
+    sealed class Data
     {
         public List<string> Files { get; } = new();
         public FileSystemWatcher Watcher { get; init; } = null!;
         public CancellationTokenSource CancellationTokenSource { get; } = new();
     }
     readonly Dictionary<string, Data> cache = new();
-    static readonly Regex validFiles = new(@"\.(?:gif|png|bmp|jpg|jpeg|webp)$", RegexOptions.IgnoreCase);
 
     public void Update(IEnumerable<string?> paths)
     {
@@ -43,7 +42,7 @@ class FileCacheService
                 lock (data.Files)
                 {
                     data.Files.Remove(e.OldFullPath);
-                    if (validFiles.IsMatch(e.FullPath))
+                    if (ValidFilesRegex().IsMatch(e.FullPath))
                         data.Files.Add(e.FullPath);
                 }
             };
@@ -55,7 +54,7 @@ class FileCacheService
             fsw.Created += (s, e) =>
             {
                 lock (data.Files)
-                    if (validFiles.IsMatch(e.FullPath))
+                    if (ValidFilesRegex().IsMatch(e.FullPath))
                         data.Files.Add(e.FullPath);
             };
 
@@ -71,7 +70,7 @@ class FileCacheService
                     tempList.Clear();
                 }
 
-                foreach (var file in Directory.EnumerateFiles(path!).Where(p => validFiles.IsMatch(p)))
+                foreach (var file in Directory.EnumerateFiles(path!).Where(p => ValidFilesRegex().IsMatch(p)))
                 {
                     tempList.Add(file);
                     if (tempList.Count > maxCacheSize)
@@ -96,4 +95,7 @@ class FileCacheService
         lock (data.Files)
             return data.Files.Count == 0 ? null : data.Files[Random.Shared.Next(data.Files.Count)];
     }
+
+    [GeneratedRegex("\\.(?:gif|png|bmp|jpg|jpeg|webp)$", RegexOptions.IgnoreCase, "en-CA")]
+    private static partial Regex ValidFilesRegex();
 }

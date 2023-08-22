@@ -17,7 +17,7 @@ using WallpaperSlideshow.Models;
 
 namespace WallpaperSlideshow.Services;
 
-partial class WallpaperService
+sealed partial class WallpaperService
 {
     static readonly FileCacheService fileCacheService = new();
     static readonly DispatcherTimer timer = new();
@@ -171,6 +171,7 @@ partial class WallpaperService
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SystemParametersInfo(SPI uiAction, uint uiParam, string pvParam, SPIF fWinIni);
 
+#pragma warning disable CA1712 // Do not prefix enum values with type name
     [Flags]
     enum SPIF
     {
@@ -180,7 +181,9 @@ partial class WallpaperService
         /// <summary>Broadcasts the WM_SETTINGCHANGE message after updating the user profile.</summary>
         SPIF_SENDCHANGE = 0x02,
         /// <summary>Same as SPIF_SENDCHANGE.</summary>
+#pragma warning disable CA1069 // Enums values should not be duplicated
         SPIF_SENDWININICHANGE = 0x02
+#pragma warning restore CA1069 // Enums values should not be duplicated
     }
 
     enum SPI : uint
@@ -192,4 +195,5 @@ partial class WallpaperService
         /// </summary>
         SPI_SETDESKWALLPAPER = 0x0014,
     }
+#pragma warning restore CA1712 // Do not prefix enum values with type name
 }

@@ -5,7 +5,7 @@ using WallpaperSlideshow.Models;
 
 namespace WallpaperSlideshow.Converters;
 
-class MonitorPreviewLeftConverter : IMultiValueConverter
+sealed class MonitorPreviewLeftConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) =>
         values.Length == 3 && values[0] is int left && values[1] is Rectangle allBounds && values[2] is double actualWidth
@@ -15,7 +15,7 @@ class MonitorPreviewLeftConverter : IMultiValueConverter
         throw new NotImplementedException();
 }
 
-class MonitorPreviewTopConverter : IMultiValueConverter
+sealed class MonitorPreviewTopConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) =>
         values.Length == 3 && values[0] is int top && values[1] is Rectangle allBounds && values[2] is double actualHeight
@@ -25,7 +25,7 @@ class MonitorPreviewTopConverter : IMultiValueConverter
         throw new NotImplementedException();
 }
 
-class MonitorPreviewWidthConverter : IMultiValueConverter
+sealed class MonitorPreviewWidthConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) =>
         values.Length == 3 && values[0] is int width && values[1] is Rectangle allBounds && values[2] is double actualWidth
@@ -35,7 +35,7 @@ class MonitorPreviewWidthConverter : IMultiValueConverter
         throw new NotImplementedException();
 }
 
-class MonitorPreviewHeightConverter : IMultiValueConverter
+sealed class MonitorPreviewHeightConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) =>
         values.Length == 3 && values[0] is int height && values[1] is Rectangle allBounds && values[2] is double actualHeight
