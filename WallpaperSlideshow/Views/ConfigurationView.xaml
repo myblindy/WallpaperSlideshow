@@ -63,6 +63,7 @@
                                 <ContextMenu>
                                     <MenuItem Header="Open Folder" Command="{Binding DataContext.OpenFolderCommand, Source={x:Reference RootWindow}}" CommandParameter="{Binding}"/>
                                     <MenuItem Header="Open in Browser" Command="{Binding DataContext.OpenInBrowserCommand, Source={x:Reference RootWindow}}" CommandParameter="{Binding}"/>
+                                    <MenuItem Header="Copy Path" Command="{Binding DataContext.CopyWallpaperPathCommand, Source={x:Reference RootWindow}}" CommandParameter="{Binding}"/>
                                 </ContextMenu>
                             </Border.ContextMenu>
                             <Image Source="{Binding CurrentWallpaperPath}" Stretch="UniformToFill"/>

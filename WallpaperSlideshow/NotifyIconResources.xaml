@@ -10,7 +10,7 @@
     </ContextMenu>
 
     <tb:TaskbarIcon x:Key="NotifyIcon" IconSource="pack://application:,,,/;component/app.ico" ToolTipText="Wallpaper Slideshow" DoubleClickCommand="{Binding ShowConfigurationCommand}"
-                    ContextMenu="{StaticResource SysTrayMenu}" MenuActivation="LeftOrRightClick">
+                    ContextMenu="{StaticResource SysTrayMenu}" MenuActivation="RightClick">
         <tb:TaskbarIcon.DataContext>
             <viewmodels:NotifyIconViewModel/>
         </tb:TaskbarIcon.DataContext>
