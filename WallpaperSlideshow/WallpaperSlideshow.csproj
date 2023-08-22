@@ -8,6 +8,7 @@
     <ApplicationIcon>app.ico</ApplicationIcon>
     <StartupObject>WallpaperSlideshow.App</StartupObject>
     <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,8 @@
   <ItemGroup>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
     <PackageReference Include="ReactiveUI.WPF" Version="17.1.9" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

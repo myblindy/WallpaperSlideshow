@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using WallpaperSlideshow.Models;
 using WallpaperSlideshow.Services;
@@ -13,17 +14,17 @@ class ConfigurationViewModel : ReactiveObject
     {
         OpenFolderCommand = ReactiveCommand.Create<Monitor>(selectedMonitor =>
         {
-            var path = WallpaperService.GetWallpaperPath(selectedMonitor!.MonitorPath!);
-            using (Process.Start(new ProcessStartInfo("explorer", $"/select,\"{path}\"") { UseShellExecute = false })) { }
+            if (WallpaperService.GetWallpaperPath(selectedMonitor!.Index) is { } path)
+                using (Process.Start(new ProcessStartInfo("explorer", $"/select,\"{path}\"") { UseShellExecute = false })) { }
         });
 
         OpenInBrowserCommand = ReactiveCommand.Create(() =>
         {
-            var path = WallpaperService.GetWallpaperPath(selectedMonitor!.MonitorPath!);
-            using (Process.Start(new ProcessStartInfo(new Uri(path).ToString()) { UseShellExecute = true })) { }
+            if (WallpaperService.GetWallpaperPath(selectedMonitor!.Index) is { } path)
+                using (Process.Start(new ProcessStartInfo(new Uri(path).ToString()) { UseShellExecute = true })) { }
         });
 
-        AdvanceSlideShowCommand = ReactiveCommand.Create(() => WallpaperService.AdvanceWallpaperSlideShow(true));
+        AdvanceSlideShowCommand = ReactiveCommand.Create(WallpaperService.AdvanceWallpaperSlideShow);
 
         SelectMonitorCommand = ReactiveCommand.Create<Monitor>(monitor => SelectedMonitor = monitor);
     }
