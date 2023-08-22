@@ -16,7 +16,7 @@ class FileCacheService
         public CancellationTokenSource CancellationTokenSource { get; } = new();
     }
     readonly Dictionary<string, Data> cache = new();
-    static readonly Regex validFiles = new(@"\.(?:gif|png|bmp|jpg|jpeg)$", RegexOptions.IgnoreCase);
+    static readonly Regex validFiles = new(@"\.(?:gif|png|bmp|jpg|jpeg|webp)$", RegexOptions.IgnoreCase);
 
     public void Update(IEnumerable<string?> paths)
     {
