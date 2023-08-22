@@ -10,6 +10,7 @@
     <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AnalysisMode>recommended</AnalysisMode>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>

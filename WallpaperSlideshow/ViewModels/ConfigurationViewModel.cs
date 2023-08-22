@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System;
 using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 using WallpaperSlideshow.Models;
 using WallpaperSlideshow.Services;
@@ -25,7 +26,7 @@ sealed class ConfigurationViewModel : ReactiveObject
 
         CopyWallpaperPathCommand = ReactiveCommand.Create<Monitor>(selectedMonitor =>
         {
-            var path = WallpaperService.GetWallpaperPath(selectedMonitor!.MonitorPath!);
+            var path = WallpaperService.GetWallpaperPath(selectedMonitor!.Index);
             Clipboard.SetText(path);
         });
 

@@ -129,7 +129,7 @@ sealed partial class WallpaperService
         var newTempDirectory = Directory.CreateTempSubdirectory();
         string imgPath = Path.Combine(newTempDirectory.FullName, @"img.jpg");
         await workImage.SaveAsJpegAsync(imgPath, new JpegEncoder { Quality = 96 });
-        SystemParametersInfo(SPI.SPI_SETDESKWALLPAPER, 1, imgPath, SPIF.None);
+        SystemParametersInfoW(SPI.SPI_SETDESKWALLPAPER, 1, imgPath, SPIF.None);
         try { tempDirectory?.Delete(true); } catch { }
         tempDirectory = newTempDirectory;
 
@@ -169,7 +169,7 @@ sealed partial class WallpaperService
 
     [LibraryImport("user32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SystemParametersInfo(SPI uiAction, uint uiParam, string pvParam, SPIF fWinIni);
+    private static partial bool SystemParametersInfoW(SPI uiAction, uint uiParam, string pvParam, SPIF fWinIni);
 
 #pragma warning disable CA1712 // Do not prefix enum values with type name
     [Flags]
