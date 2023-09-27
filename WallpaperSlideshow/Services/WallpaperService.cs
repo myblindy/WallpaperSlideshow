@@ -37,20 +37,26 @@ sealed partial class WallpaperService
                 timer.Stop();
         }
 
+        static void updatePaths()
+        {
+            var paths = new List<string>();
+            if (!string.IsNullOrWhiteSpace(Monitor.PathHorizontal))
+                paths.Add(Monitor.PathHorizontal);
+            if (!string.IsNullOrWhiteSpace(Monitor.PathVertical))
+                paths.Add(Monitor.PathVertical);
+            fileCacheService.Update(paths);
+        }
+
         // bind the timer interval
         setTimer();
+        updatePaths();
         Monitor.StaticPropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(Monitor.IntervalSeconds))
                 setTimer();
             else if (e.PropertyName is nameof(Monitor.PathHorizontal) or nameof(Monitor.PathVertical))
             {
-                var paths = new List<string>();
-                if (!string.IsNullOrWhiteSpace(Monitor.PathHorizontal))
-                    paths.Add(Monitor.PathHorizontal);
-                if (!string.IsNullOrWhiteSpace(Monitor.PathVertical))
-                    paths.Add(Monitor.PathVertical);
-                fileCacheService.Update(paths);
+                updatePaths();
                 setTimer();
             }
         };
