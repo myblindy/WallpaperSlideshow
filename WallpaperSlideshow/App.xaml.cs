@@ -19,15 +19,10 @@ public partial class App : Application
 
     const string configurationFileName = "config.json";
 
-    sealed class MonitorConfiguration
-    {
-        public int Index { get; set; }
-        public List<string> Paths { get; set; } = null!;
-    }
-
     sealed class Configuration
     {
-        public List<MonitorConfiguration> Monitors { get; set; } = null!;
+        public string? PathVertical { get; set; }
+        public string? PathHorizontal { get; set; }
         public double IntervalSeconds { get; set; }
     }
 
@@ -45,12 +40,8 @@ public partial class App : Application
             if (JsonSerializer.Deserialize<Configuration>(stream) is { } configuration)
             {
                 Monitor.IntervalSeconds = configuration.IntervalSeconds;
-                foreach (var monitor in configuration.Monitors)
-                {
-                    while (Monitor.AllMonitors.Count - 1 < monitor.Index)
-                        Monitor.AllMonitors.Add(new() { Index = Monitor.AllMonitors.Count });
-                    Monitor.AllMonitors[^1].Path = monitor.Paths.FirstOrDefault();
-                }
+                Monitor.PathVertical = configuration.PathVertical;
+                Monitor.PathHorizontal = configuration.PathHorizontal;
             }
         }
 
@@ -75,12 +66,10 @@ public partial class App : Application
         using var stream = store.CreateFile(configurationFileName);
         JsonSerializer.Serialize(stream, new Configuration
         {
-            Monitors = Monitor.AllMonitors.Select(w => new MonitorConfiguration
-            {
-                Index = w.Index,
-                Paths = string.IsNullOrWhiteSpace(w.Path) ? new() : new() { w.Path },
-            }).ToList(),
             IntervalSeconds = Monitor.IntervalSeconds,
+            PathVertical = Monitor.PathVertical,
+            PathHorizontal = Monitor.PathHorizontal,
+
         });
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ReactiveUI;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -15,11 +16,10 @@ sealed class Monitor : ReactiveObject
     bool active;
     public bool Active { get => active; set => this.RaiseAndSetIfChanged(ref active, value); }
 
-    string? path;
-    public string? Path { get => path; set => this.RaiseAndSetIfChanged(ref path, value); }
-
     string? currentWallpaperPath;
     public string? CurrentWallpaperPath { get => currentWallpaperPath; set => this.RaiseAndSetIfChanged(ref currentWallpaperPath, value); }
+
+    public bool IsHorizontal => Screen is null ? true : Screen.Bounds.Width > Screen.Bounds.Height;
 
     public static ObservableCollection<Monitor> AllMonitors { get; } = new();
 
@@ -29,5 +29,16 @@ sealed class Monitor : ReactiveObject
     static double intervalSeconds = 60;
     public static double IntervalSeconds { get => intervalSeconds; set { intervalSeconds = value; StaticPropertyChanged?.Invoke(null, new(nameof(IntervalSeconds))); } }
 
+    static string? pathHorizontal, pathVertical;
+    public static string? PathHorizontal { get => pathHorizontal; set { pathHorizontal = value; StaticPropertyChanged?.Invoke(null, new(nameof(PathHorizontal))); } }
+    public static string? PathVertical { get => pathVertical; set { pathVertical = value; StaticPropertyChanged?.Invoke(null, new(nameof(PathVertical))); } }
+
     public static event PropertyChangedEventHandler? StaticPropertyChanged;
+
+    public Monitor Clone() => new()
+    {
+        Index = Index,
+        Active = Active,
+        CurrentWallpaperPath = CurrentWallpaperPath,
+    };
 }

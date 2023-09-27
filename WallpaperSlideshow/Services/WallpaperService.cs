@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -42,14 +43,17 @@ sealed partial class WallpaperService
         {
             if (e.PropertyName == nameof(Monitor.IntervalSeconds))
                 setTimer();
+            else if (e.PropertyName is nameof(Monitor.PathHorizontal) or nameof(Monitor.PathVertical))
+            {
+                var paths = new List<string>();
+                if (!string.IsNullOrWhiteSpace(Monitor.PathHorizontal))
+                    paths.Add(Monitor.PathHorizontal);
+                if (!string.IsNullOrWhiteSpace(Monitor.PathVertical))
+                    paths.Add(Monitor.PathVertical);
+                fileCacheService.Update(paths);
+                setTimer();
+            }
         };
-
-        // bind the file cache
-        Monitor.AllMonitors.ToObservableChangeSet().AutoRefresh().Subscribe(_ =>
-        {
-            fileCacheService.Update(Monitor.AllMonitors.Select(w => w.Path));
-            setTimer();
-        });
     }
 
     public static void UpdateGeometry()
@@ -86,17 +90,15 @@ sealed partial class WallpaperService
     static DirectoryInfo? tempDirectory;
     public static async Task AdvanceWallpaperSlideShow()
     {
-        (int index, string? path)[] monitors;
+        Monitor[]? monitors;
         Models.Rectangle? allScreenBounds;
-        Monitor[]? screenBounds;
 
         UpdateGeometry();
 
         lock (Monitor.AllMonitors)
         {
-            monitors = Monitor.AllMonitors.Where(s => s.Active && !string.IsNullOrWhiteSpace(s.Path) && s.Screen is not null).Select(s => (s.Index, s.Path)).ToArray();
+            monitors = Monitor.AllMonitors.Where(s => s.Active && s.Screen is not null).Select(s => s.Clone()).ToArray();
             allScreenBounds = Monitor.AllBounds;
-            screenBounds = Monitor.AllMonitors.Where(m => m.Active && m.Screen is not null).ToArray();
         }
 
         if (allScreenBounds is null) return;
@@ -135,9 +137,9 @@ sealed partial class WallpaperService
 
         async Task drawMonitorWallpaper(int monitorIdx)
         {
-            if (workImage is not null && !string.IsNullOrWhiteSpace(monitors[monitorIdx].path))
+            if (workImage is not null && (monitors[monitorIdx].IsHorizontal ? Monitor.PathHorizontal : Monitor.PathVertical) is { } basePath)
                 for (int retry = 0; retry < 100; ++retry)
-                    if (fileCacheService.GetRandomFilePath(monitors[monitorIdx].path!) is { } wallpaperPath)
+                    if (fileCacheService.GetRandomFilePath(basePath) is { } wallpaperPath)
                     {
                         try
                         {
@@ -146,8 +148,8 @@ sealed partial class WallpaperService
                             // load the image and resize it
                             var image = await Image.LoadAsync(wallpaperPath);
                             var imageAR = (float)image.Width / image.Height;
-                            int screenWidth = screenBounds[monitorIdx].Screen!.Bounds.Width;
-                            int screenHeight = screenBounds[monitorIdx].Screen!.Bounds.Height;
+                            int screenWidth = monitors[monitorIdx].Screen!.Bounds.Width;
+                            int screenHeight = monitors[monitorIdx].Screen!.Bounds.Height;
                             var monitorAR = (float)screenWidth / screenHeight;
                             var (newWidth, newHeight) = imageAR < monitorAR ? (screenWidth, 0) : (0, screenHeight);
                             image.Mutate(ctx => ctx.Resize(newWidth, newHeight, KnownResamplers.Lanczos3));
@@ -158,7 +160,7 @@ sealed partial class WallpaperService
 
                             workImage.Mutate(ctx => ctx.DrawImage(image,
                                 new SixLabors.ImageSharp.Point(
-                                    screenBounds[monitorIdx].Screen!.Bounds.Left - allScreenBounds.Left, screenBounds[monitorIdx].Screen!.Bounds.Top - allScreenBounds.Top),
+                                    monitors[monitorIdx].Screen!.Bounds.Left - allScreenBounds.Left, monitors[monitorIdx].Screen!.Bounds.Top - allScreenBounds.Top),
                                 1f));
                         }
                         catch { }

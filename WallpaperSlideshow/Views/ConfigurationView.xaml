@@ -44,14 +44,14 @@
                         <Border Grid.RowSpan="2" Grid.ColumnSpan="2" BorderBrush="Gray" BorderThickness="1" Cursor="Hand">
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource MonitorPreviewWidthConverter}">
-                                    <Binding Path="Bounds.Width"/>
+                                    <Binding Path="Screen.Bounds.Width"/>
                                     <Binding Path="(models:Monitor.AllBounds)"/>
                                     <Binding Path="ActualWidth" ElementName="MonitorPreview"/>
                                 </MultiBinding>
                             </Border.Width>
                             <Border.Height>
                                 <MultiBinding Converter="{StaticResource MonitorPreviewHeightConverter}">
-                                    <Binding Path="Bounds.Height"/>
+                                    <Binding Path="Screen.Bounds.Height"/>
                                     <Binding Path="(models:Monitor.AllBounds)"/>
                                     <Binding Path="ActualHeight" ElementName="MonitorPreview"/>
                                 </MultiBinding>
@@ -77,7 +77,7 @@
                     <Setter Property="Canvas.Left">
                         <Setter.Value>
                             <MultiBinding Converter="{StaticResource MonitorPreviewLeftConverter}">
-                                <Binding Path="Bounds.Left"/>
+                                <Binding Path="Screen.Bounds.Left"/>
                                 <Binding Path="(models:Monitor.AllBounds)"/>
                                 <Binding Path="ActualWidth" ElementName="MonitorPreview"/>
                             </MultiBinding>
@@ -86,7 +86,7 @@
                     <Setter Property="Canvas.Top">
                         <Setter.Value>
                             <MultiBinding Converter="{StaticResource MonitorPreviewTopConverter}">
-                                <Binding Path="Bounds.Top"/>
+                                <Binding Path="Screen.Bounds.Top"/>
                                 <Binding Path="(models:Monitor.AllBounds)"/>
                                 <Binding Path="ActualHeight" ElementName="MonitorPreview"/>
                             </MultiBinding>
@@ -123,8 +123,8 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Monitor" Binding="{Binding Index}"/>
                 <DataGridCheckBoxColumn Header="Active" Binding="{Binding Active}"/>
-                <DataGridTextColumn Header="X" Binding="{Binding Bounds.Left}"/>
-                <DataGridTextColumn Header="Y" Binding="{Binding Bounds.Top}"/>
+                <DataGridTextColumn Header="X" Binding="{Binding Screen.Bounds.Left}"/>
+                <DataGridTextColumn Header="Y" Binding="{Binding Screen.Bounds.Top}"/>
                 <DataGridTextColumn Header="Geometry" Binding="{Binding Converter={StaticResource MonitorToGeometryTypeConverter}}"/>
             </DataGrid.Columns>
         </DataGrid>
@@ -138,11 +138,13 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0">Path:</TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path}"/>
+            <TextBlock Grid.Row="0" Grid.Column="0">Horizontal Path:</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=(models:Monitor.PathHorizontal), Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0">Vertical Path:</TextBlock>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=(models:Monitor.PathVertical), Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
         </Grid>
     </Grid>
 </Window>
