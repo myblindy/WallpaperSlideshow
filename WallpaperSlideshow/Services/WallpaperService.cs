@@ -169,7 +169,7 @@ sealed partial class WallpaperService
                                     monitors[monitorIdx].Screen!.Bounds.Left - allScreenBounds.Left, monitors[monitorIdx].Screen!.Bounds.Top - allScreenBounds.Top),
                                 1f));
                         }
-                        catch { }
+                        catch { continue; }
                         break;
                     }
         }
