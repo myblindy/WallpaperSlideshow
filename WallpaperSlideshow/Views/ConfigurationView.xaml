@@ -137,14 +137,10 @@
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0">Horizontal Path:</TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=(models:Monitor.PathHorizontal), Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="0">Vertical Path:</TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=(models:Monitor.PathVertical), Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+            <TextBlock Grid.Row="0" Grid.Column="0">Source Path:</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=(models:Monitor.SourcePath), Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
         </Grid>
     </Grid>
 </Window>

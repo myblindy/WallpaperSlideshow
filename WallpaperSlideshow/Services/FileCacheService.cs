@@ -70,7 +70,7 @@ sealed partial class FileCacheService
                     tempList.Clear();
                 }
 
-                foreach (var file in Directory.EnumerateFiles(path!).Where(p => ValidFilesRegex().IsMatch(p)))
+                foreach (var file in Directory.EnumerateFiles(path!, "*", SearchOption.AllDirectories).Where(p => ValidFilesRegex().IsMatch(p)))
                 {
                     tempList.Add(file);
                     if (tempList.Count > maxCacheSize)

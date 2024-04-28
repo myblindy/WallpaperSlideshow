@@ -29,9 +29,8 @@ sealed class Monitor : ReactiveObject
     static double intervalSeconds = 60;
     public static double IntervalSeconds { get => intervalSeconds; set { intervalSeconds = value; StaticPropertyChanged?.Invoke(null, new(nameof(IntervalSeconds))); } }
 
-    static string? pathHorizontal, pathVertical;
-    public static string? PathHorizontal { get => pathHorizontal; set { pathHorizontal = value; StaticPropertyChanged?.Invoke(null, new(nameof(PathHorizontal))); } }
-    public static string? PathVertical { get => pathVertical; set { pathVertical = value; StaticPropertyChanged?.Invoke(null, new(nameof(PathVertical))); } }
+    static string? sourcePath;
+    public static string? SourcePath { get => sourcePath; set { sourcePath = value; StaticPropertyChanged?.Invoke(null, new(nameof(SourcePath))); } }
 
     public static event PropertyChangedEventHandler? StaticPropertyChanged;
 

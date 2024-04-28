@@ -21,8 +21,7 @@ public partial class App : Application
 
     sealed class Configuration
     {
-        public string? PathVertical { get; set; }
-        public string? PathHorizontal { get; set; }
+        public string? SourcePath { get; set; }
         public double IntervalSeconds { get; set; }
     }
 
@@ -40,8 +39,7 @@ public partial class App : Application
             if (JsonSerializer.Deserialize<Configuration>(stream) is { } configuration)
             {
                 Monitor.IntervalSeconds = configuration.IntervalSeconds;
-                Monitor.PathVertical = configuration.PathVertical;
-                Monitor.PathHorizontal = configuration.PathHorizontal;
+                Monitor.SourcePath = configuration.SourcePath;
             }
         }
 
@@ -67,9 +65,7 @@ public partial class App : Application
         JsonSerializer.Serialize(stream, new Configuration
         {
             IntervalSeconds = Monitor.IntervalSeconds,
-            PathVertical = Monitor.PathVertical,
-            PathHorizontal = Monitor.PathHorizontal,
-
+            SourcePath = Monitor.SourcePath,
         });
     }
 }

@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WallpaperSlideshow.Models;
 
@@ -40,10 +41,8 @@ sealed partial class WallpaperService
         static void updatePaths()
         {
             var paths = new List<string>();
-            if (!string.IsNullOrWhiteSpace(Monitor.PathHorizontal))
-                paths.Add(Monitor.PathHorizontal);
-            if (!string.IsNullOrWhiteSpace(Monitor.PathVertical))
-                paths.Add(Monitor.PathVertical);
+            if (!string.IsNullOrWhiteSpace(Monitor.SourcePath))
+                paths.Add(Monitor.SourcePath);
             fileCacheService.Update(paths);
         }
 
@@ -54,7 +53,7 @@ sealed partial class WallpaperService
         {
             if (e.PropertyName == nameof(Monitor.IntervalSeconds))
                 setTimer();
-            else if (e.PropertyName is nameof(Monitor.PathHorizontal) or nameof(Monitor.PathVertical))
+            else if (e.PropertyName is nameof(Monitor.SourcePath))
             {
                 updatePaths();
                 setTimer();
@@ -143,17 +142,27 @@ sealed partial class WallpaperService
 
         async Task drawMonitorWallpaper(int monitorIdx)
         {
-            if (workImage is not null && (monitors[monitorIdx].IsHorizontal ? Monitor.PathHorizontal : Monitor.PathVertical) is { } basePath)
-                for (int retry = 0; retry < 100; ++retry)
-                    if (fileCacheService.GetRandomFilePath(basePath) is { } wallpaperPath)
-                    {
+            if (workImage is not null && Monitor.SourcePath is not null)
+                for (int retry = 0; retry < 200; ++retry)
+                    if (fileCacheService.GetRandomFilePath(Monitor.SourcePath) is { } wallpaperPath)
                         try
                         {
-                            wallpaperPaths[monitorIdx] = wallpaperPath;
+                            // get the image information
+                            float imageAR;
+                            using (var stream = File.OpenRead(wallpaperPath))
+                            {
+                                var bitmapFrame = BitmapFrame.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+                                imageAR = (float)bitmapFrame.PixelWidth / bitmapFrame.PixelHeight;
+                                if (!((imageAR <= 1 && !Monitor.AllMonitors[monitorIdx].IsHorizontal)
+                                    || (imageAR > 1 && Monitor.AllMonitors[monitorIdx].IsHorizontal)))
+                                {
+                                    continue;
+                                }
+                            }
 
                             // load the image and resize it
-                            var image = await Image.LoadAsync(wallpaperPath);
-                            var imageAR = (float)image.Width / image.Height;
+                            using var image = await Image.LoadAsync(wallpaperPath);
+                            wallpaperPaths[monitorIdx] = wallpaperPath;
                             int screenWidth = monitors[monitorIdx].Screen!.Bounds.Width;
                             int screenHeight = monitors[monitorIdx].Screen!.Bounds.Height;
                             var monitorAR = (float)screenWidth / screenHeight;
@@ -168,10 +177,10 @@ sealed partial class WallpaperService
                                 new SixLabors.ImageSharp.Point(
                                     monitors[monitorIdx].Screen!.Bounds.Left - allScreenBounds.Left, monitors[monitorIdx].Screen!.Bounds.Top - allScreenBounds.Top),
                                 1f));
+
+                            break;
                         }
-                        catch { continue; }
-                        break;
-                    }
+                        catch { }
         }
     }
 
