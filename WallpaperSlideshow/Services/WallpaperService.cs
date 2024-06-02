@@ -153,8 +153,8 @@ sealed partial class WallpaperService
                             {
                                 var bitmapFrame = BitmapFrame.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
                                 imageAR = (float)bitmapFrame.PixelWidth / bitmapFrame.PixelHeight;
-                                if (!((imageAR <= 1 && !Monitor.AllMonitors[monitorIdx].IsHorizontal)
-                                    || (imageAR > 1 && Monitor.AllMonitors[monitorIdx].IsHorizontal)))
+                                if (!((imageAR <= 1.15 && !Monitor.AllMonitors[monitorIdx].IsHorizontal)
+                                    || (imageAR > 1.15 && Monitor.AllMonitors[monitorIdx].IsHorizontal)))
                                 {
                                     continue;
                                 }
